@@ -1,0 +1,23 @@
+public class Test_WhatsappIntegration {
+    @future (callout=true)
+    public static void Sendmessage()
+    {
+        try{
+        Http http_protocol = new Http();
+        HttpRequest http_request = new HttpRequest();
+        http_request.setEndpoint('https://graph.facebook.com/v13.0/101879725965400/messages');          
+        http_request.setHeader('Content-Type','application/json');
+        http_request.setMethod('POST');
+        String token_api ='EAAIJL4oM8Q0BAPZCvMr94UZCts12x7AO7IcdbvtJ7yjYA8oqHTTA1gsnC8xA1HsC9XjMZBx8fWHaDvA90lZB74XBOLv6gRUHkOPnU0moQ1NtqasZBDuhERQTKYS8PswJUs4URGdHh23Eku6ZCrpZBUfXI17ba3ZBVZAhTtL4kSxjipkk2ZAK6ZC2Vac';
+        http_request.setHeader('Authorization','Bearer '+token_api);   
+    	Ticketinfo__c ticket_object = [select Customer_Name__c,Name,Complain_Description__c,Customer_Mobile__c,Date_of_Resolve__c from ticketinfo__c order by ticketinfo__c.Name desc limit 1];
+        http_request.setBody('{"messaging_product": "whatsapp","recipient_type": "individual","to": "'+ticket_object.Customer_Mobile__c+'","type": "template","template": {"name": "complaint_raise","language": {"code": "en_US"},"components": [{"type": "body","parameters": [{"type": "text","text": "'+ticket_object.Customer_Name__c+'"},{"type": "text","text": "'+ticket_object.Name+'"},{"type": "text","text": "'+ticket_object.Complain_Description__c+'"},{"type": "text","text": "'+date.today().format()+'"},{"type": "text","text": "'+ticket_object.Date_of_Resolve__c+'"}]}]}}');
+        HttpResponse response =http_protocol.send(http_request);
+        System.debug('try '+response.getBody());
+        }
+        catch(Exception e)
+        {
+            System.debug(e.getStackTraceString());
+        }
+    }
+}
